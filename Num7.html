@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Перевірка знання таблиці множення</title>
+    <style>
+        .task {
+            margin: 20px 0;
+        }
+        .result {
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Перевірка знання таблиці множення</h1>
+    <div>
+        <span>Загальний рахунок: </span><span id="score">0</span>
+    </div>
+    <div>
+        <span>Номер завдання: </span><span id="questionNumber">1</span>/10
+    </div>
+    <div class="task">
+        <div id="task"></div>
+        <form id="optionsForm">
+            <input type="radio" name="option" id="option1" value="0">
+            <label for="option1" id="label1"></label><br>
+            <input type="radio" name="option" id="option2" value="1">
+            <label for="option2" id="label2"></label><br>
+            <input type="radio" name="option" id="option3" value="2">
+            <label for="option3" id="label3"></label><br>
+            <input type="radio" name="option" id="option4" value="3">
+            <label for="option4" id="label4"></label><br>
+        </form>
+    </div>
+    <button id="nextTaskButton" onclick="generateTask()" disabled>Наступне завдання</button>
+    <div class="result" id="result"></div>
+
+    <script>
+        let score = 0;
+        let correctAnswerIndex = 0;
+        let questionNumber = 1;
+        const maxQuestions = 10;
+
+        function generateTask() {
+            if (questionNumber > maxQuestions) {
+                document.getElementById('task').innerText = 'Тест завершено!';
+                document.getElementById('nextTaskButton').disabled = true;
+                document.getElementById('result').innerText = `Ваш підсумковий рахунок: ${score}`;
+                return;
+            }
+
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            const correctAnswer = num1 * num2;
+
+            correctAnswerIndex = Math.floor(Math.random() * 4);
+
+            document.getElementById('task').innerText = `Скільки буде ${num1} * ${num2}?`;
+            document.getElementById('result').innerText = '';
+            document.getElementById('questionNumber').innerText = questionNumber;
+
+            const options = [];
+            for (let i = 0; i < 4; i++) {
+                if (i === correctAnswerIndex) {
+                    options.push(correctAnswer);
+                } else {
+                    let wrongAnswer;
+                    do {
+                        wrongAnswer = Math.floor(Math.random() * 100) + 1;
+                    } while (wrongAnswer === correctAnswer || options.includes(wrongAnswer));
+                    options.push(wrongAnswer);
+                }
+            }
+
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`label${i + 1}`).innerText = options[i];
+                document.getElementById(`option${i + 1}`).checked = false;
+                document.getElementById(`option${i + 1}`).disabled = false;
+            }
+
+            document.getElementById('nextTaskButton').disabled = true;
+        }
+
+        document.getElementById('optionsForm').addEventListener('change', function(event) {
+            const selectedOption = parseInt(event.target.value);
+            if (selectedOption === correctAnswerIndex) {
+                document.getElementById('result').innerText = 'Правильно!';
+                score++;
+            } else {
+                document.getElementById('result').innerText = 'Неправильно.';
+            }
+            document.getElementById('score').innerText = score;
+            // Disable further changes after the first attempt
+            const options = document.getElementsByName('option');
+            for (let option of options) {
+                option.disabled = true;
+            }
+            document.getElementById('nextTaskButton').disabled = false;
+            questionNumber++;
+        });
+
+        // Initial task generation on page load
+        generateTask();
+    </script>
+</body>
+</html>
